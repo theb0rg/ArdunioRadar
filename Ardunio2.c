@@ -1,13 +1,13 @@
-﻿const int echoPin 7 // Echo Pin
-﻿const int trigPin 8 // Trigger Pin
-﻿const int LEDPin 13 // Onboard LED
+﻿#define echoPin 7 // Echo Pin
+﻿#define trigPin 8 // Trigger Pin
+ //#define LEDPin 13 // Onboard LED
 
 void setup() {
 	// initialize serial communication:
 	Serial.begin(9600);
 	pinMode(trigPin, OUTPUT);
         pinMode(echoPin, INPUT);
-        pinMode(LEDPin, OUTPUT); // Use LED indicator (if required)
+        //pinMode(LEDPin, OUTPUT); // Use LED indicator (if required)
 }
 
 void loop()
