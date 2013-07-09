@@ -1,33 +1,100 @@
-﻿const int pingPin = 7;
+﻿#include <Servo.h>
+
+
+#define echoPin 7 // Echo Pin
+﻿#define trigPin 8 // Trigger Pin
+
+const short ServoMax = 160;
+const short ServoMin = 10;
+short CurrentPosition = 90;
+short CurrentDirection = 1;
+
+Servo ScannerModule;
+Servo LeftEngine;
+Servo RightEngine;
 
 void setup() {
-	// initialize serial communication:
+	//Initialize serial
 	Serial.begin(9600);
+
+	//Initialize scanner
+	ScannerModule.attach(4);
+	pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+
+	//Initialize warpengine
+    //LeftEngine.attach(0);
+    //RightEngine.attach(1);
+
+	ScannerModule.Write(CurrentPosition);
+	delay(150);
 }
 
 void loop()
 {
-	cm = microsecondsToCentimeters(Scan());
+	Servo::refresh();
+	NextPosition(25);
+	long cm = microsecondsToCentimeters(Scan());
 	Serial.println(cm);
-	delay(100);
+	delay(50);
+}
+
+//Subjective analysis is 300ms for 160 degrees. 300 / 160 = 1,875 MS Per degree?
+void NextPosition(int degrees)
+{
+	if(CurrentDirection == 1)
+	{	
+
+		if(CurrentPosition < ServoMax)
+		{
+			CurrentPosition += degrees;
+			ScannerModule.write(CurrentPosition);
+
+			if(CurrentPosition > ServoMax)
+			{
+				ScannerModule.write(ServoMax);
+				delay(1.875 * degrees - (degrees - CurrentPosition + ServoMax));
+				ScannerModule.write(ServoMax - (degrees - CurrentPosition + ServoMax) );
+				CurrentDirection = 0;
+
+			}
+			else{
+				ScannerModule.write(CurrentPosition);
+			}
+		}
+	}
+	else if(CurrentDirection == 0){
+		if(CurrentPosition > ServoMin)
+		{
+			CurrentPosition -= degrees;
+			ScannerModule.write(CurrentPosition);
+
+			if(CurrentPosition < ServoMin)
+			{
+				ScannerModule.write(ServoMin);
+				delay(1.875 * ((degrees - CurrentPosition - ServoMin) - ServoMin));
+				ScannerModule.write(degrees - CurrentPosition - ServoMin);
+				CurrentDirection = 1;
+
+			}
+			else{
+				ScannerModule.write(CurrentPosition);
+			}
+		}
+	}
 }
 
 long Scan()
 {
-	// The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
-	// Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
-	pinMode(pingPin, OUTPUT);
-	digitalWrite(pingPin, LOW);
-	delayMicroseconds(2);
-	digitalWrite(pingPin, HIGH);
-	delayMicroseconds(5);
-	digitalWrite(pingPin, LOW);
+	digitalWrite(trigPin, LOW); 
+ 	delayMicroseconds(2); 
 
-	// The same pin is used to read the signal from the PING))): a HIGH
-	// pulse whose duration is the time (in microseconds) from the sending
-	// of the ping to the reception of its echo off of an object.
-	pinMode(pingPin, INPUT);
-	return pulseIn(pingPin, HIGH);
+ 	digitalWrite(trigPin, HIGH);
+ 	delayMicroseconds(5); 
+ 
+ 	digitalWrite(trigPin, LOW);
+
+	return pulseIn(echoPin, HIGH,38000);
 }
 
 long microsecondsToCentimeters(long microseconds)
