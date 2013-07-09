@@ -7,7 +7,7 @@ void setup() {
 
 void loop()
 {
-	cm = microsecondsToCentimeters(Scan());
+	long cm = microsecondsToCentimeters(Scan());
 	Serial.println(cm);
 	delay(100);
 }
