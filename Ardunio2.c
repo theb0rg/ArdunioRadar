@@ -27,7 +27,7 @@ long Scan()
  
  	digitalWrite(trigPin, LOW);
 
-	return pulseIn(echoPin, HIGH);
+	return pulseIn(echoPin, HIGH,38000);
 }
 
 long microsecondsToCentimeters(long microseconds)
