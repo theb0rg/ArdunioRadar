@@ -26,13 +26,12 @@ void setup() {
     //LeftEngine.attach(0);
     //RightEngine.attach(1);
 
-	ScannerModule.Write(CurrentPosition);
+	ScannerModule.write(CurrentPosition);
 	delay(150);
 }
 
 void loop()
 {
-	Servo::refresh();
 	NextPosition(25);
 	long cm = microsecondsToCentimeters(Scan());
 	Serial.println(cm);
