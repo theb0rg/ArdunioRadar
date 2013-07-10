@@ -4,6 +4,7 @@
 #define echoPin 7 // Echo Pin
 ﻿#define trigPin 8 // Trigger Pin
 
+const short DegreesToMove = 25;
 const short ServoMax = 160;
 const short ServoMin = 10;
 short CurrentPosition = 90;
@@ -32,13 +33,23 @@ void setup() {
 
 void loop()
 {
-	NextPosition(25);
+	//Go to next position.
+	NextPosition(DegreesToMove);
+	//Wait for the servo to go to position.
+	delay(CalculateMicrosecondsServo(DegreesToMove));
+	//Scan and convert to centimeters.
 	long cm = microsecondsToCentimeters(Scan());
-	Serial.println(cm);
-	delay(50);
+	//Write value to serialport.
+	Serial.println(cm + ";" + CurrentPosition);
 }
 
 //Subjective analysis is 300ms for 160 degrees. 300 / 160 = 1,875 MS Per degree?
+int CalculateMicrosecondsServo(short degrees)
+{
+	return 1.875 * degrees;
+}
+
+
 void NextPosition(int degrees)
 {
 	if(CurrentDirection == 1)
@@ -52,7 +63,7 @@ void NextPosition(int degrees)
 			if(CurrentPosition > ServoMax)
 			{
 				ScannerModule.write(ServoMax);
-				delay(1.875 * degrees - (degrees - CurrentPosition + ServoMax));
+				delay(CalculateMicrosecondsServo((degrees - (degrees - CurrentPosition + ServoMax))));
 				ScannerModule.write(ServoMax - (degrees - CurrentPosition + ServoMax) );
 				CurrentDirection = 0;
 
@@ -71,7 +82,7 @@ void NextPosition(int degrees)
 			if(CurrentPosition < ServoMin)
 			{
 				ScannerModule.write(ServoMin);
-				delay(1.875 * ((degrees - CurrentPosition - ServoMin) - ServoMin));
+				delay(CalculateMicrosecondsServo((degrees - CurrentPosition - ServoMin) - ServoMin));
 				ScannerModule.write(degrees - CurrentPosition - ServoMin);
 				CurrentDirection = 1;
 

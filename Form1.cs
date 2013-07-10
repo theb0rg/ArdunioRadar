@@ -14,7 +14,8 @@ namespace ArdunioRadar
     public partial class Form1 : Form
     {
         static String ComPort = "";
-        delegate void SetTextCallback(string text);
+        delegate void SetTextDistanceCallback(string text);
+        delegate void SetTextDegreesCallback(string text);
         delegate void SetColorCallback(Color color);
 
         Thread thread;
@@ -45,7 +46,7 @@ namespace ArdunioRadar
                 //MessageBox.Show(e.ToString());
             }
         }
-        private void SetText(string text)
+        private void SetTextDistance(string text)
         {
             // InvokeRequired required compares the thread ID of the
             // calling thread to the thread ID of the creating thread.
@@ -54,7 +55,7 @@ namespace ArdunioRadar
             {
                 if (this.txtDistance.InvokeRequired)
                 {
-                    SetTextCallback d = new SetTextCallback(SetText);
+                    SetTextDistanceCallback d = new SetTextDistanceCallback(SetTextDistance);
                     this.Invoke(d, new object[] { text });
                 }
                 else
@@ -64,6 +65,30 @@ namespace ArdunioRadar
             }
             catch(Exception e){
                // return "Error";
+                //MessageBox.Show(e.ToString());
+            }
+        }
+
+        private void SetTextDegrees(string text)
+        {
+            // InvokeRequired required compares the thread ID of the
+            // calling thread to the thread ID of the creating thread.
+            // If these threads are different, it returns true.
+            try
+            {
+                if (this.txtDegree.InvokeRequired)
+                {
+                    SetTextDistanceCallback d = new SetTextDistanceCallback(SetTextDegrees);
+                    this.Invoke(d, new object[] { text });
+                }
+                else
+                {
+                    this.txtDegree.Text = text;
+                }
+            }
+            catch (Exception e)
+            {
+                // return "Error";
                 //MessageBox.Show(e.ToString());
             }
         }
@@ -110,7 +135,22 @@ namespace ArdunioRadar
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             SerialPort port = (SerialPort)sender;
-            SetText(port.ReadExisting());
+            String[] data = port.ReadExisting().Split(new char[] { ';' });
+            if (data.Count() >= 2)
+            {
+                SetTextDistance(data[0] + "CM");
+                SetTextDegrees(data[1] + "o");
+            }
+            else
+            {
+                SetTextDistance("?");
+                SetTextDegrees("?");
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            ardunioRadarControl1.Refresh();
         }
     }
 }

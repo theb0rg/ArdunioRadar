@@ -43,6 +43,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ArdunioRadarControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ArdunioRadarControl.Designer.cs">
+      <DependentUpon>ArdunioRadarControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DBGraphics.cs" />
+    <Compile Include="PingResponse.cs" />
     <Compile Include="SerialPortDisposable.cs" />
     <Content Include="Ardunio.c" />
     <Compile Include="Form1.cs">
@@ -53,7 +61,11 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Ardunio3.c" />
     <None Include="Ardunio2.c" />
+    <EmbeddedResource Include="ArdunioRadarControl.resx">
+      <DependentUpon>ArdunioRadarControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
