@@ -1,10 +1,10 @@
 ﻿#include <Servo.h>
 
-
 #define echoPin 7 // Echo Pin
 ﻿#define trigPin 8 // Trigger Pin
 
 const short DegreesToMove = 25;
+const short ExtraDelay    = 0;
 const short ServoMax = 160;
 const short ServoMin = 10;
 short CurrentPosition = 90;
@@ -35,12 +35,18 @@ void loop()
 {
 	//Go to next position.
 	NextPosition(DegreesToMove);
+
 	//Wait for the servo to go to position.
 	delay(CalculateMicrosecondsServo(DegreesToMove));
+
 	//Scan and convert to centimeters.
 	long cm = microsecondsToCentimeters(Scan());
+
 	//Write value to serialport.
 	Serial.println(cm + ";" + CurrentPosition);
+
+	//Optional extra delay:
+	Delay(ExtraDelay);
 }
 
 //Subjective analysis is 300ms for 160 degrees. 300 / 160 = 1,875 MS Per degree?
