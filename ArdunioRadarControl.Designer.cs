@@ -35,7 +35,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Name = "ArdunioRadarControl";
-            this.Size = new System.Drawing.Size(426, 296);
+            this.Size = new System.Drawing.Size(490, 296);
             this.Load += new System.EventHandler(this.ArdunioRadarControl_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.ArdunioRadarControl_Paint);
             this.ResumeLayout(false);
