@@ -16,6 +16,7 @@ namespace ArdunioRadar
         static String ComPort = "";
         delegate void SetTextDistanceCallback(string text);
         delegate void SetTextDegreesCallback(string text);
+        delegate void SetTextRawInputCallback(string text);
         delegate void SetPingResponseCallback(PingResponse ping);
         delegate void SetColorCallback(Color color);
 
@@ -44,7 +45,28 @@ namespace ArdunioRadar
             catch (Exception e)
             {
                 // return "Error";
-                //MessageBox.Show(e.ToString());
+                MessageBox.Show(e.ToString());
+            }
+        }
+
+        private void SetTextRawInput(String text)
+        {
+            try
+            {
+                if (this.txtRawInput.InvokeRequired)
+                {
+                    SetTextRawInputCallback d = new SetTextRawInputCallback(SetTextRawInput);
+                    this.Invoke(d, new object[] { text });
+                }
+                else
+                {
+                    this.txtRawInput.Text = text;
+                }
+            }
+            catch (Exception e)
+            {
+                // return "Error";
+                MessageBox.Show(e.ToString());
             }
         }
         private void SetTextDistance(string text)
@@ -66,7 +88,7 @@ namespace ArdunioRadar
             }
             catch(Exception e){
                // return "Error";
-                //MessageBox.Show(e.ToString());
+                MessageBox.Show(e.ToString());
             }
         }
 
@@ -90,7 +112,7 @@ namespace ArdunioRadar
             catch (Exception e)
             {
                 // return "Error";
-                //MessageBox.Show(e.ToString());
+                MessageBox.Show(e.ToString());
             }
         }
 
@@ -129,8 +151,11 @@ namespace ArdunioRadar
                 thread.Abort();
                 thread = new Thread(new ThreadStart(this.UpdateThread));
             }
-
-            thread.Start();            
+            else
+            {
+                thread = new Thread(new ThreadStart(this.UpdateThread));
+                thread.Start();
+            }      
         }
 
         private void UpdateThread()
@@ -160,26 +185,36 @@ namespace ArdunioRadar
 
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            SerialPort port = (SerialPort)sender;
-            String[] data = port.ReadExisting().Split(new char[] { ';' });
-            if (data.Count() >= 2)
+            try
             {
-                int Distance = Convert.ToInt32(data[0]);
-                int Degrees  = Convert.ToInt32(data[1]);
+                SerialPort port = (SerialPort)sender;
+                String input = port.ReadLine();
+                SetTextRawInput(input);
 
-                SetTextDistance(Distance + " CM");
-                SetTextDegrees(Degrees + "o");
-                SetPingResponse(new PingResponse(Degrees, Distance));
+                String[] data = input.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (data.Count() >= 2)
+                {
+                    int Distance = Convert.ToInt32(data[0]);
+                    int Degrees = Convert.ToInt32(data[1]);
+
+                    SetTextDistance(Distance + " CM");
+                    SetTextDegrees(Degrees + "o");
+                    SetPingResponse(new PingResponse(Degrees, Distance));
+                }
+                else if (data.Count() == 1)
+                {
+                    SetTextDistance("OLD VERSION");
+                    SetTextDegrees("OLD VERSION");
+                }
+                else
+                {
+                    SetTextDistance("?");
+                    SetTextDegrees("?");
+                }
             }
-            else if (data.Count() == 1)
-            {
-                SetTextDistance("OLD VERSION");
-                SetTextDegrees("OLD VERSION");
-             }
-            else
-            {
-                SetTextDistance("?");
-                SetTextDegrees("?");
+            catch(Exception ex){
+                MessageBox.Show(ex.ToString());
             }
         }
 
@@ -188,9 +223,18 @@ namespace ArdunioRadar
         {
            // if (degreeeees > 180)
            //         degreeeees = 0;
-           // degreeeees += 25;
+           //degreeeees += 25;
            //     ardunioRadarControl1.UpdateRadar(new PingResponse(degreeeees, 300));
            // ardunioRadarControl1.Refresh();
+
+            if (thread.IsAlive)
+            {
+                button1.Text = "Connected";
+            }
+            else
+            {
+                button1.Text = "Disconnected";
+            }      
         }
 
         private void button2_Click(object sender, EventArgs e)

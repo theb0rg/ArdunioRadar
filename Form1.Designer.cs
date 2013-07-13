@@ -40,6 +40,7 @@
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.ardunioRadarControl1 = new ArdunioRadar.ArdunioRadarControl();
             this.button2 = new System.Windows.Forms.Button();
+            this.txtRawInput = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // txtDistance
@@ -126,6 +127,7 @@
             // 
             // ardunioRadarControl1
             // 
+            this.ardunioRadarControl1.LinesEnabled = false;
             this.ardunioRadarControl1.Location = new System.Drawing.Point(4, 136);
             this.ardunioRadarControl1.Name = "ardunioRadarControl1";
             this.ardunioRadarControl1.Size = new System.Drawing.Size(477, 296);
@@ -141,11 +143,19 @@
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
+            // txtRawInput
+            // 
+            this.txtRawInput.Location = new System.Drawing.Point(12, 493);
+            this.txtRawInput.Name = "txtRawInput";
+            this.txtRawInput.Size = new System.Drawing.Size(195, 20);
+            this.txtRawInput.TabIndex = 9;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 525);
+            this.Controls.Add(this.txtRawInput);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.ardunioRadarControl1);
             this.Controls.Add(this.label2);
@@ -179,6 +189,7 @@
         private ArdunioRadarControl ardunioRadarControl1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TextBox txtRawInput;
     }
 }
 

@@ -27,7 +27,6 @@ namespace ArdunioRadar
             pen.Width = 5;
 
             memGraphics = new DBGraphics();
-            //drawObj = new DrawObject();
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
@@ -117,8 +116,8 @@ namespace ArdunioRadar
             double y1 = startPoint.Y;
             double x2 = x1 + (Math.Cos(angleRadians) * length);
             double y2 = y1 + (Math.Sin(angleRadians) * length);
-            int intX1 = Convert.ToInt32(x1);
-            int intY1 = Convert.ToInt32(y1);
+            //int intX1 = Convert.ToInt32(x1);
+            //int intY1 = Convert.ToInt32(y1);
             int intX2 = Convert.ToInt32(x2);
             int intY2 = Convert.ToInt32(y2);
 

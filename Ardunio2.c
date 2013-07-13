@@ -43,10 +43,10 @@ void loop()
 	long cm = microsecondsToCentimeters(Scan());
 
 	//Write value to serialport.
-	Serial.println(cm + ";" + CurrentPosition);
+	Serial.println(String(cm) + ";" + String(CurrentPosition));
 
 	//Optional extra delay:
-	Delay(ExtraDelay);
+	delay(ExtraDelay);
 }
 
 //Subjective analysis is 300ms for 160 degrees. 300 / 160 = 1,875 MS Per degree?
