@@ -14,7 +14,10 @@ namespace ArdunioRadar
     public partial class ArdunioRadarControl : UserControl
     {
         private DBGraphics memGraphics;
-        //private DrawObject drawObj;
+        private List<PingResponse> pings;
+        private Pen pen;
+
+        public bool LinesEnabled { get; set;  }
 
         public ArdunioRadarControl()
         {
@@ -30,9 +33,6 @@ namespace ArdunioRadar
         protected override void OnPaintBackground(PaintEventArgs pevent)
         {
         }
-
-        private List<PingResponse> pings;
-        private Pen pen;
 
         public void UpdateRadar(PingResponse response)
         {
@@ -56,27 +56,36 @@ namespace ArdunioRadar
 
             return newestPing;
         }
-        private int test = 0;
+
         private void ArdunioRadarControl_Paint(object sender, PaintEventArgs e)
         {
             if (memGraphics.CanDoubleBuffer())
             {
-
                 // Fill in Background (for effieciency only the area that has been clipped)
                 memGraphics.g.FillRectangle(new SolidBrush(SystemColors.Window), e.ClipRectangle.X, e.ClipRectangle.Y, e.ClipRectangle.Width, e.ClipRectangle.Height);
 
                 if(pings.Any())
                 {
-                DrawScanner(pings.Last().Degree, memGraphics.g);
+                DrawScanner(pings.Last().Degree,pings.Last().Distance, memGraphics.g);
                 }
                 else{
-                DrawScanner(90, memGraphics.g);
+                DrawScanner(90,400, memGraphics.g);
                 }
 
+                Pen pen2 = new Pen(Color.Red,1);
+                Point lastHitPoint = Point.Empty;
                 foreach (PingResponse response in pings)
                 {
+                    
                     Point HitPoint = CalculateHitPoint(response.Degree, response.Distance, 400);
+                    if (lastHitPoint != Point.Empty && LinesEnabled)
+                    {
+                        memGraphics.g.DrawLine(pen2, lastHitPoint, HitPoint);
+                    }
+                    lastHitPoint = HitPoint;
                     memGraphics.g.DrawRectangle(pen, new Rectangle(HitPoint, new Size(1, 1)));
+
+
                 }
 
                 // Render to the form
@@ -134,9 +143,9 @@ namespace ArdunioRadar
             memGraphics.g.DrawLine(DottedPen, StartPoint, EndPoint);
         }
 
-        private void DrawScanner(int degree, Graphics g)
+        private void DrawScanner(int degree, int length, Graphics g)
         {
-            DrawScannerLine(degree,400, g);   
+            DrawScannerLine(degree, length, g);   
 
             degree = degree - 90;
 

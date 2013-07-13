@@ -186,11 +186,17 @@ namespace ArdunioRadar
         int degreeeees = 90;
         private void timer1_Tick(object sender, EventArgs e)
         {
-            //if (degreeeees > 180)
-            //        degreeeees = 0;
-            //degreeeees += 25; ;
+           // if (degreeeees > 180)
+           //         degreeeees = 0;
+           // degreeeees += 25;
            //     ardunioRadarControl1.UpdateRadar(new PingResponse(degreeeees, 300));
            // ardunioRadarControl1.Refresh();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ardunioRadarControl1.LinesEnabled = ! ardunioRadarControl1.LinesEnabled;
+            ardunioRadarControl1.Refresh();
         }
     }
 }
