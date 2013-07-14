@@ -17,16 +17,23 @@ namespace ArdunioRadar
         private List<PingResponse> pings;
         private Pen pen;
 
-        public bool LinesEnabled { get; set;  }
+        public bool ShowLines { get; set;  }
+        public int ResolutionInCentimeters { get; set; }
+        public bool ShowScanner { get; set; }
+        public TimeSpan DotsTimeToLive { get; set; }
+        public bool EnableScannerRotation { get; set; }
 
         public ArdunioRadarControl()
         {
             InitializeComponent();
             pings = new List<PingResponse>();
-            pen = new Pen(Color.Black);
-            pen.Width = 5;
-
+            pen = new Pen(Color.Black,5);
             memGraphics = new DBGraphics();
+            DotsTimeToLive = TimeSpan.FromSeconds(2);
+            EnableScannerRotation = true;
+            ShowScanner = true;
+            ResolutionInCentimeters = 400;
+            ShowLines = false;
         }
 
         protected override void OnPaintBackground(PaintEventArgs pevent)
@@ -35,7 +42,15 @@ namespace ArdunioRadar
 
         public void UpdateRadar(PingResponse response)
         {
-            pings.Add(response);
+            if (EnableScannerRotation)
+            {
+                pings.Add(response);
+            }
+            else
+            {
+                response.Degree = 90;
+                pings.Add(response);
+            }
         }
 
         public void Clear()
@@ -63,12 +78,16 @@ namespace ArdunioRadar
                 // Fill in Background (for effieciency only the area that has been clipped)
                 memGraphics.g.FillRectangle(new SolidBrush(SystemColors.Window), e.ClipRectangle.X, e.ClipRectangle.Y, e.ClipRectangle.Width, e.ClipRectangle.Height);
 
-                if(pings.Any())
+                if (ShowScanner)
                 {
-                DrawScanner(pings.Last().Degree,pings.Last().Distance, memGraphics.g);
-                }
-                else{
-                DrawScanner(90,400, memGraphics.g);
+                    if (pings.Any())
+                    {
+                        DrawScanner(pings.Last().Degree, pings.Last().Distance, memGraphics.g);
+                    }
+                    else
+                    {
+                        DrawScanner(90, 400, memGraphics.g);
+                    }
                 }
 
                 Pen pen2 = new Pen(Color.Red,1);
@@ -77,21 +96,19 @@ namespace ArdunioRadar
                 {
                     
                     Point HitPoint = CalculateHitPoint(response.Degree, response.Distance, 400);
-                    if (lastHitPoint != Point.Empty && LinesEnabled)
+                    if (lastHitPoint != Point.Empty && ShowLines)
                     {
                         memGraphics.g.DrawLine(pen2, lastHitPoint, HitPoint);
                     }
                     lastHitPoint = HitPoint;
                     memGraphics.g.DrawRectangle(pen, new Rectangle(HitPoint, new Size(1, 1)));
-
-
                 }
 
                 // Render to the form
                 memGraphics.Render(e.Graphics);
 
            // Graphics g = e.Graphics;
-              pings = pings.FindAll(X => X.timestamp > DateTime.Now - TimeSpan.FromSeconds(2));
+                pings = pings.FindAll(X => X.timestamp > DateTime.Now - DotsTimeToLive);
             }
         }
 

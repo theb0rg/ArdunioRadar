@@ -26,6 +26,10 @@ namespace ArdunioRadar
         {
             InitializeComponent();
             thread = new Thread(new ThreadStart(this.UpdateThread));
+            barTimeToLive.Value = (int)ardunioRadarControl1.DotsTimeToLive.TotalSeconds;
+            lblApperanceSeconds.Text = barTimeToLive.Value.ToString();
+            barResolution.Value = ardunioRadarControl1.ResolutionInCentimeters;
+            lblResolutionValue.Text = barResolution.Value.ToString();
         }
 
         private void SetColor(Color color)
@@ -178,8 +182,13 @@ namespace ArdunioRadar
                     }
                 }
             }
-            catch(Exception e){
-                MessageBox.Show(e.ToString());
+            catch (ThreadAbortException tException)
+            {
+
+            }
+            catch (Exception e)
+            {
+                 MessageBox.Show(e.ToString());
             }
         }
 
@@ -204,8 +213,10 @@ namespace ArdunioRadar
                 }
                 else if (data.Count() == 1)
                 {
-                    SetTextDistance("OLD VERSION");
-                    SetTextDegrees("OLD VERSION");
+                    int Distance = Convert.ToInt32(data[0]);
+                    SetTextDistance(Distance + " CM");
+                    SetPingResponse(new PingResponse(90, Distance));
+                    SetTextDegrees("?");
                 }
                 else
                 {
@@ -221,11 +232,11 @@ namespace ArdunioRadar
         int degreeeees = 90;
         private void timer1_Tick(object sender, EventArgs e)
         {
-           // if (degreeeees > 180)
-           //         degreeeees = 0;
-           //degreeeees += 25;
-           //     ardunioRadarControl1.UpdateRadar(new PingResponse(degreeeees, 300));
-           // ardunioRadarControl1.Refresh();
+            if (degreeeees > 180)
+                    degreeeees = 0;
+           degreeeees += 25;
+                ardunioRadarControl1.UpdateRadar(new PingResponse(degreeeees, 300));
+            ardunioRadarControl1.Refresh();
 
             if (thread.IsAlive)
             {
@@ -239,7 +250,41 @@ namespace ArdunioRadar
 
         private void button2_Click(object sender, EventArgs e)
         {
-            ardunioRadarControl1.LinesEnabled = ! ardunioRadarControl1.LinesEnabled;
+            ardunioRadarControl1.ShowLines = ! ardunioRadarControl1.ShowLines;
+            ardunioRadarControl1.Refresh();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if(thread.IsAlive)
+            thread.Abort();
+        }
+
+        private void btnShowScanner_Click(object sender, EventArgs e)
+        {
+            ardunioRadarControl1.ShowScanner = !ardunioRadarControl1.ShowScanner;
+            ardunioRadarControl1.Refresh();
+        }
+
+        private void btnLockScanner_Click(object sender, EventArgs e)
+        {
+            ardunioRadarControl1.EnableScannerRotation = !ardunioRadarControl1.EnableScannerRotation;
+            ardunioRadarControl1.Refresh();
+        }
+
+        private void barTimeToLive_Scroll(object sender, EventArgs e)
+        {
+            TrackBar control = (TrackBar)sender;
+            ardunioRadarControl1.DotsTimeToLive = TimeSpan.FromSeconds(control.Value);
+            lblApperanceSeconds.Text = control.Value.ToString();
+            ardunioRadarControl1.Refresh();
+        }
+
+        private void barResolution_Scroll(object sender, EventArgs e)
+        {
+            TrackBar control = (TrackBar)sender;
+            ardunioRadarControl1.ResolutionInCentimeters = control.Value;
+            lblResolutionValue.Text = control.Value.ToString();
             ardunioRadarControl1.Refresh();
         }
     }
